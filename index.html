@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="lista.png.png" type="image/png">
+    <title>Cadastro e Calculadora</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .section {
+            background-color: #fff;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 300px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"], select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #2368b3;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .produto {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .produto button {
+            background-color: #dc3545;
+        }
+
+        .produto button:hover {
+            background-color: #c82333;
+        }
+
+        #display {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 1.2em;
+        }
+
+        .calculator button {
+            width: 23%;
+            margin: 1%;
+            padding: 15px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="section">
+            <h2>Cadastro de Produtos</h2>
+            <div>
+                <label for="produto">Produto:</label>
+                <input type="text" id="produto">
+                <label for="valor">Valor:</label>
+                <input type="text" id="valor">
+                <label for="categoria">Categoria:</label>
+                <select id="categoria">
+                    <option value="Eletrônicos">Eletrônicos</option>
+                    <option value="Vestuário">Vestuário</option>
+                    <option value="Cosméticos">Cosméticos</option>
+                    <option value="Livros">Livros</option>
+                </select>
+                <button onclick="adicionarProduto()">Adicionar Produto</button>
+            </div>
+            <div>
+                <label for="pesquisa">Pesquisar Produto:</label>
+                <input type="text" id="pesquisa" oninput="pesquisarProdutos()">
+            </div>
+            <div id="lista-produtos"></div>
+        </div>
+
+        <div class="section">
+            <h2>Calculadora</h2>
+            <div>
+                <input type="text" id="display" placeholder="0">
+            </div>
+
+            <div class="calculator">
+                <button onclick="appendToDisplay('7')">7</button>
+                <button onclick="appendToDisplay('8')">8</button>
+                <button onclick="appendToDisplay('9')">9</button>
+                <button onclick="appendToDisplay('4')">4</button>
+                <button onclick="appendToDisplay('5')">5</button>
+                <button onclick="appendToDisplay('6')">6</button>
+                <button onclick="appendToDisplay('1')">1</button>
+                <button onclick="appendToDisplay('2')">2</button>
+                <button onclick="appendToDisplay('3')">3</button>
+                <button onclick="appendToDisplay('0')">0</button>
+                <button onclick="appendToDisplay('+')">+</button>
+                <button onclick="appendToDisplay('-')">-</button>
+                <button onclick="clearDisplay()">C</button>
+                <button onclick="calculate()">=</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var produtos = [];
+
+        function adicionarProduto() {
+            var produtoInput = document.getElementById('produto');
+            var valorInput = document.getElementById('valor');
+            var categoriaInput = document.getElementById('categoria');
+
+            var produto = produtoInput.value;
+            var valor = valorInput.value;
+            var categoria = categoriaInput.value;
+
+            if (produto && valor && categoria) {
+                var novoProduto = { produto: produto, valor: valor, categoria: categoria };
+                produtos.push(novoProduto);
+                exibirProdutos();
+                produtoInput.value = '';
+                valorInput.value = '';
+                categoriaInput.value = 'Eletrônicos';
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        }
+
+        function exibirProdutos() {
+            var listaProdutos = document.getElementById('lista-produtos');
+            listaProdutos.innerHTML = '';
+
+            produtos.forEach(function(produto, index) {
+                var produtoItem = document.createElement('div');
+                produtoItem.classList.add('produto');
+                produtoItem.innerHTML = '<div><h3>' + produto.produto + '</h3>' +
+                                        '<p><strong>Valor:</strong> R$ ' + produto.valor + '</p>' +
+                                        '<p><strong>Categoria:</strong> ' + produto.categoria + '</p></div>' +
+                                        '<button onclick="removerProduto(' + index + ')">Remover</button>';
+                listaProdutos.appendChild(produtoItem);
+            });
+        }
+
+        function removerProduto(index) {
+            produtos.splice(index, 1);
+            exibirProdutos();
+        }
+
+        function pesquisarProdutos() {
+            var pesquisaInput = document.getElementById('pesquisa').value.toLowerCase();
+            var listaProdutos = document.getElementById('lista-produtos');
+            listaProdutos.innerHTML = '';
+
+            produtos.forEach(function(produto, index) {
+                if (produto.produto.toLowerCase().includes(pesquisaInput) ||
+                    produto.categoria.toLowerCase().includes(pesquisaInput) ||
+                    produto.valor.toLowerCase().includes(pesquisaInput)) {
+                    var produtoItem = document.createElement('div');
+                    produtoItem.classList.add('produto');
+                    produtoItem.innerHTML = '<div><h3>' + produto.produto + '</h3>' +
+                                            '<p><strong>Valor:</strong> R$ ' + produto.valor + '</p>' +
+                                            '<p><strong>Categoria:</strong> ' + produto.categoria + '</p></div>' +
+                                            '<button onclick="removerProduto(' + index + ')">Remover</button>';
+                    listaProdutos.appendChild(produtoItem);
+                }
+            });
+        }
+
+        function appendToDisplay(value) {
+            document.getElementById('display').value += value;
+        }
+
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+        }
+
+        function calculate() {
+            try {
+                var expression = document.getElementById('display').value;
+                var result = eval(expression);
+                document.getElementById('display').value = result;
+            } catch (error) {
+                document.getElementById('display').value = 'ERROR';
+            }
+        }
+    </script>
+</body>
+</html>
